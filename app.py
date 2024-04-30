@@ -11,7 +11,7 @@ importlib.reload(sys)
 app = Flask(__name__)
 
 # 全局变量
-username = "TJU"
+username = "user"
 # TODO: username变量的赋值  方法1：全局变量实现，随登录进行修改  方法2：给每个页面传递username
 userRole = "CUSTOMER"
 notFinishedNum = 0
@@ -1359,6 +1359,8 @@ def MenuAdd():
         f = request.files['imagesrc']
         print(f)
         isSpecialty = int(request.form.get('isSpecialty'))
+        egg=request.form.get('egg')
+        sweet=request.form.get('sweet')
         if f and allowed_file(f.filename):
             filename = secure_filename(f.filename)
             f.save('static/images/' + filename)
@@ -1382,7 +1384,7 @@ def MenuAdd():
             print("失败！该菜品已经添加过！")
             msg = "fail1"
         else:
-            sql2 = "insert into DISHES  values ('{}', '{}','{}', '{}',{}, {},'{}', {}) ".format(dishname,rest,dishinfo,nutriention,price,0,imgsrc,isSpecialty)
+            sql2 = "insert into DISHES  values ('{}', '{}','{}', '{}',{}, {},'{}', {},'{}','{}') ".format(dishname,rest,dishinfo,nutriention,price,0,imgsrc,isSpecialty,sweet,egg)
             print(sql2)
             try:
                 cursor.execute(sql2)
@@ -1534,7 +1536,7 @@ def MerchantOrderPage():
         except:
             print("Error: unable to use database!")
 
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' Order BY tansactiontime DESC" % username
+        sql = "SELECT * FROM ORDER_COMMENT WHERE restaurant = '%s' Order BY tansactiontime DESC" % username
         cursor.execute(sql)
         res = cursor.fetchall()
         print(res)
@@ -1556,7 +1558,7 @@ def MerchantOrderPage():
         except:
             print("Error: unable to use database!")
 
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' Order BY cost ASC" % username
+        sql = "SELECT * FROM ORDER_COMMENT WHERE restaurant = '%s' Order BY cost ASC" % username
         cursor.execute(sql)
         res = cursor.fetchall()
         print(res)
@@ -1578,7 +1580,7 @@ def MerchantOrderPage():
         except:
             print("Error: unable to use database!")
 
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 0 " % username
+        sql = "SELECT * FROM ORDER_COMMENT WHERE restaurant = '%s' AND isFinished = 0 " % username
         cursor.execute(sql)
         res = cursor.fetchall()
         print(res)
