@@ -70,7 +70,7 @@
 				<form action="{{ url_for('MerchantOrderPage') }}" method="post">
 					<input type="submit" name="action" value="按时间排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
 					<input type="submit" name="action" value="按价格排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
-					<span class="badge" style="float: right;">{{ notFinishedNum }}</span><input type="submit" name="action" value="未完成订单" style="background-color: transparent; color: #FBB448; float: right; font-size: 16px; outline:none; border:0px;">
+					<span class="badge" style="float: right;">{{ notFinishedNum }}</span><input type="submit" name="action" value="待处理订单" style="background-color: transparent; color: #FBB448; float: right; font-size: 16px; outline:none; border:0px;">
 				</form>
 			</div>
 			<br/><br/>
@@ -79,11 +79,13 @@
 				<div class="col-lg-12 col-md-4 col-sm-6">
 					{% if messages == "done" %}
 						{% for item in result %}
-							<a href={{item[8]}} class="fh5co-card-item image-popup">
+					<div class="fh5co-card-item">
+							<a href={{item[8]}}>
 								<figure class="col-lg-4" style="float: left;">
 									<div class="overlay"><i class="ti-plus"></i></div>
 									<img src={{item[8]}} alt="Image" class="img-responsive">
 								</figure>
+								</a>
 								<div class="fh5co-text">
 									<h2 style="margin-top: 40px;"> 商品：{{ item[2] }} </h2>
 									<p>订单号：{{ item[0] }}</p>
@@ -101,20 +103,26 @@
 									{% if item[7] == 1 %}
 										<p>订单状态：已完成</p>
 									{% elif item[7] == 0 %}
-										<p>订单状态：<span style="color: red;">未完成</span></p>
+										<p>订单状态：<span style="color: red;">待发货</span></p>
 									{% endif %}
 									<p>订单总价格：<span class="price cursive-font">￥{{ item[13]}}</span></p>
-									{% if messages1 == "yes" %}
 						<!-- <p style="text-align: center;"><strong style="font-size: 18px;">您还没有订单哦！</strong></p> -->
 <!--						<form action ="{{url_for('resComment')}}" method = "POST">-->
 <!--									<input name = "restaurant" value="{{item[0]}}" style = "display:none;">-->
-									<input type = "submit" name = "action" value = "发货" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
+<!--									<input type = "submit" name = "action" value = "发货" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">-->
 <!--								</form>-->
+									<form action="{{ url_for('MerchantOrderPage') }}" method="post">
+										<input name="orderID" value={{ item[0] }} style="display: none;">
+										{% if item[7] == 0 %}
+                                            <input type="submit" name="action" value="发货" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
+									</form>
 					{% endif %}
 								</div>
-							</a>
+					</div>
 						{% endfor %}
-
+					{% elif messages == "UpdateSucceed" %}
+					<script>alert("发货成功！")</script>
+					<script type='text/javascript'>window.location.href='MerchantOrderPage'</script>
 					{% elif messages == "none" %}
 						<!-- <p style="text-align: center;"><strong style="font-size: 18px;">您还没有订单哦！</strong></p> -->
 						<div class="alert alert-danger" role="alert">您还没有订单哦！</div>

@@ -808,7 +808,8 @@ def ModifyPassword():
 @app.route('/OrderPage', methods=['GET', 'POST'])
 def OrderPage():
     msg = ""
-    global notFinishedNum
+    global notFinishedNum0
+    global notFinishedNum2
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
@@ -822,7 +823,11 @@ def OrderPage():
         presql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 0" % username
         cursor.execute(presql)
         res1 = cursor.fetchall()
-        notFinishedNum = len(res1)
+        notFinishedNum0 = len(res1)
+        presql2 = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 2" % username
+        cursor.execute(presql2)
+        ress2 = cursor.fetchall()
+        notFinishedNum2 = len(ress2)
         # 查询其他信息
         sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s'" % username
         cursor.execute(sql)
@@ -833,7 +838,7 @@ def OrderPage():
             msg = "done"
             print(msg)
             return render_template('OrderPage.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=notFinishedNum)
+                                   notFinishedNum0=notFinishedNum0,notFinishedNum2=notFinishedNum2)
         else:
             print("NULL")
             msg = "none"
@@ -855,7 +860,7 @@ def OrderPage():
             msg = "done"
             print(msg)
             return render_template('OrderPage.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=notFinishedNum)
+                                   notFinishedNum0=notFinishedNum0,notFinishedNum2=notFinishedNum2)
         else:
             print("NULL")
             msg = "none"
@@ -877,12 +882,12 @@ def OrderPage():
             msg = "done"
             print(msg)
             return render_template('OrderPage.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=notFinishedNum)
+                                   notFinishedNum0=notFinishedNum0,notFinishedNum2=notFinishedNum2)
         else:
             print("NULL")
             msg = "none"
-        return render_template('OrderPage.html', username=username, messages=msg, notFinishedNum=notFinishedNum)
-    elif request.form["action"] == "未完成订单":
+        return render_template('OrderPage.html', username=username, messages=msg, notFinishedNum0=notFinishedNum0,notFinishedNum2=notFinishedNum2)
+    elif request.form["action"] == "待发货订单":
         db = MySQLdb.connect("localhost", "root", "1234", "appDB", charset='utf8')
         cursor = db.cursor()
         try:
@@ -899,11 +904,35 @@ def OrderPage():
             msg = "done"
             print(msg)
             return render_template('OrderPage.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=len(res))
+                                   notFinishedNum0=len(res),notFinishedNum2=notFinishedNum2)
         else:
             print("NULL")
             msg = "none"
-        return render_template('OrderPage.html', username=username, messages=msg, notFinishedNum=notFinishedNum)
+        return render_template('OrderPage.html', username=username, messages=msg, notFinishedNum0=notFinishedNum0,
+                               notFinishedNum2=notFinishedNum2)
+    elif request.form["action"] == "待收货订单":
+        db = MySQLdb.connect("localhost", "root", "1234", "appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+
+        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 2 " % username
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        print(res)
+        print(len(res))
+        if len(res):
+            msg = "done"
+            print(msg)
+            return render_template('OrderPage.html', username=username, result=res, messages=msg,
+                                   notFinishedNum2=len(res),notFinishedNum0=notFinishedNum0)
+        else:
+            print("NULL")
+            msg = "none"
+        return render_template('OrderPage.html', username=username, messages=msg, notFinishedNum2=notFinishedNum2,
+                               notFinishedNum0=notFinishedNum0)
     elif request.form["action"] == "确认收货":
         db = MySQLdb.connect("localhost", "root", "1234", "appDB", charset='utf8')
         cursor = db.cursor()
@@ -1572,7 +1601,7 @@ def MerchantOrderPage():
             print("NULL")
             msg = "none"
         return render_template('MerchantOrderPage.html', username=username, messages=msg, notFinishedNum=notFinishedNum)
-    elif request.form["action"] == "未完成订单":
+    elif request.form["action"] == "待处理订单":
         db = MySQLdb.connect("localhost", "root", "1234", "appDB", charset='utf8')
         cursor = db.cursor()
         try:
@@ -1595,6 +1624,21 @@ def MerchantOrderPage():
             print("NULL")
             msg = "none"
         return render_template('MerchantOrderPage.html', username=username, messages=msg, notFinishedNum=notFinishedNum)
+    elif request.form["action"] == "发货":
+        db = MySQLdb.connect("localhost", "root", "1234", "appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+        orderID = request.form['orderID']
+        print(orderID)
+        sql1 = "Update ORDER_COMMENT SET isFinished = 2 WHERE orderID = '%s' " % orderID
+        print(sql1)
+        cursor.execute(sql1)
+        db.commit()
+        msg = "UpdateSucceed"
+        return render_template('MerchantOrderPage.html', username=username, messages=msg)
     else:
         return render_template('MerchantOrderPage.html', username=username, messages=msg)
 

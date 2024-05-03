@@ -70,7 +70,9 @@
 				<form action="{{ url_for('OrderPage') }}" method="post">
 					<input type="submit" name="action" value="按时间排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
 					<input type="submit" name="action" value="按价格排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
-					<span class="badge" style="float: right;">{{ notFinishedNum }}</span><input type="submit" name="action" value="未完成订单" style="background-color: transparent; color: #FBB448; float: right; font-size: 16px; outline:none; border:0px;">
+					<span class="badge" style="float: right;">{{ notFinishedNum2 }}</span><input type="submit" name="action" value="待收货订单" style="background-color: transparent; color: #FBB448; float: right; font-size: 16px; outline:none; border:0px;">
+					<span class="badge" style="float: right;">{{ notFinishedNum0 }}</span><input type="submit" name="action" value="待发货订单" style="background-color: transparent; color: #FBB448; float: right; font-size: 16px; outline:none; border:0px;">
+
 				</form>
 			</div>
 			<br/><br/>
@@ -101,12 +103,14 @@
 									{% if item[7] == 1 %}
 										<p>订单状态：已完成</p>
 									{% elif item[7] == 0 %}
-										<p>订单状态：<span style="color: red;">未完成</span></p>
+										<p>订单状态：<span style="color: red;">待发货</span></p>
+									{% elif item[7] == 2 %}
+										<p>订单状态：<span style="color: red;">商家已发货</span></p>
 									{% endif %}
 									<p style="margin-left: 322px;">订单总价格：<span class="price cursive-font">￥{{ item[13]}}</span></p>
 									<form action="{{ url_for('OrderPage') }}" method="post">
 										<input name="orderID" value={{ item[0] }} style="display: none;">
-										{% if item[7] == 0 %}
+										{% if item[7] != 1 %}
                                             <input type="submit" name="action" value="确认收货" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
                                         {% endif %}
 									</form>
@@ -122,7 +126,7 @@
 
 					{% elif messages == "none" %}
 						<!-- <p style="text-align: center;"><strong style="font-size: 18px;">您还没有订单哦！</strong></p> -->
-						<div class="alert alert-danger" role="alert">您还没有未完成订单哦！</div>
+						<div class="alert alert-danger" role="alert">暂无订单！</div>
 					{% endif %}
 					
 				</div>				
