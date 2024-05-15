@@ -46,7 +46,6 @@ def registerPage():
         userRole = request.form.get('userRole')
         print(userRole)
         print(username)
-        # 连接数据库，默认数据库用户名root，密码空
         db = MySQLdb.connect("localhost", "root", "1234", "appDB", charset='utf8')
 
         if userRole == 'RESTAURANT':
@@ -67,7 +66,8 @@ def registerPage():
                 print("失败！商家已注册！")
                 msg = "fail1"
             else:
-                sql2 = "insert into RESTAURANT (username, password, address, phone) values ('{}', '{}', '{}', '{}') ".format(username, password, addr, phone)
+                sql2 = "insert into RESTAURANT (username, password, address, phone) values ('{}', '{}', '{}', '{}') "\
+                    .format(username, password, addr, phone)
 
                 try:
                     cursor.execute(sql2)
@@ -98,7 +98,8 @@ def registerPage():
                 print("用户已注册！请直接登录。")
                 msg = "fail2"
             else:
-                sql2 = "insert into CUSTOMER (username, password, address, phone) values ('{}', '{}', '{}', '{}') ".format(username, password, addr, phone)
+                sql2 = "insert into CUSTOMER (username, password, address, phone) values ('{}', '{}', '{}', '{}') "\
+                    .format(username, password, addr, phone)
 
                 try:
                     cursor.execute(sql2)
@@ -696,10 +697,35 @@ def shoppingCartPage():
         print(mode)
         if mode == 1:
             print("堂食")
-
         else:
             print("外送")
         return render_template('index.html')
+    elif request.form["action"] == "搜索":
+        print("serch")
+        content = request.form['content']
+        db = MySQLdb.connect("localhost", "root", "1234", "appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+           print("Error: unable to use database!")
+        # sql = "SELECT * FROM shoppingcart where dishname like ?"
+        sql = "SELECT * FROM shoppingcart WHERE dishname LIKE '%%%s%%'" % content
+
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        print(res)
+        # print(len(res))
+        if len(res) != 0:
+            msg = "done"
+            print(msg)
+            print(len(res))
+            sum = len(res)
+            return render_template('myOrder.html', username=username, result=res, messages=msg, sum=sum)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('myOrder.html', username=username, messages=msg, sum=0)
     # elif request.form["action"] == "查看营养成分":
     #     dishname = request.form['dishname']
     #     print(dishname)
@@ -742,7 +768,20 @@ def personalPage():
 def ModifyPersonalInfo():
     msg = ""
     if request.method == 'GET':
-        return render_template('ModifyPersonalInfo.html', username=username)
+        db = MySQLdb.connect("localhost", "root", "1234", "appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+        sql1 = "select address from {} where username = '{}'".format(userRole,username)
+        cursor.execute(sql1)
+        res1=cursor.fetchall()
+        print(res1)
+        sql2 = "select phone from {} where username = '{}'".format(userRole, username)
+        cursor.execute(sql2)
+        res2 = cursor.fetchall()
+        return render_template('ModifyPersonalInfo.html', username=username,address=res1[0][0],phone=res2[0][0])
     if request.method == 'POST':
         # username = request.form['username']
         address = request.form['address']
@@ -1587,7 +1626,7 @@ def MerchantOrderPage():
         except:
             print("Error: unable to use database!")
 
-        sql = "SELECT * FROM ORDER_COMMENT WHERE restaurant = '%s' Order BY cost ASC" % username
+        sql = "SELECT * FROM ORDER_COMMENT WHERE restaurant = '%s' Order BY cost DESC" % username
         cursor.execute(sql)
         res = cursor.fetchall()
         print(res)

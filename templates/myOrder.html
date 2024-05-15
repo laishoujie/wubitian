@@ -38,8 +38,14 @@
 		<div class="container">
 			<div class="header">
 				<div class="header-search">
-					<input type="text" placeholder="请输入内容" class='header-search-input' autocomplete="off"><!--
-					--><button type='submit'>搜 索</button>
+<!--					<input type="text" placeholder="请输入内容" class='header-search-input' autocomplete="off">&lt;!&ndash;-->
+<!--					&ndash;&gt;<button type='submit'>搜 索</button>-->
+					<form action="{{url_for('shoppingCartPage')}}" method="POST">
+
+    <input type="text" name="content" id="content" placeholder="请输入搜索内容" autocomplete="off">
+   <input type="submit" name="action" value="搜索" style="font-size: 16px;width:58px;padding-right:8px">
+
+</form>
 					<div class="list">
 					</div>
 				</div>
